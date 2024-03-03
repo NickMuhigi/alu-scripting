@@ -8,23 +8,36 @@ import requests
 
 
 def top_ten(subreddit):
+    """Prints the titles of the first
+    10 hot posts listed for a given
+    subreddit.
+    """
+    # Set the Default URL strings
     base_url = 'https://www.reddit.com'
-    api_uri = f'{base_url}/r/{subreddit}/hot.json'
+    api_uri = '{base}/r/{subreddit}/hot.json'.format(base=base_url,
+                                                     subreddit=subreddit)
+
+    # Set an User-Agent
     user_agent = {'User-Agent': 'Python/requests'}
+
+    # Set the Query Strings to Request
     payload = {'limit': '10'}
 
-    res = requests.get(api_uri, headers=user_agent, params=payload, allow_redirects=False)
+    # Get the Response of the Reddit API
+    res = requests.get(api_uri, headers=user_agent,
+                       params=payload, allow_redirects=False)
 
-    if res.status_code == 200:  # If response is successful
-        try:
-            res_json = res.json()
-            hot_posts = res_json['data']['children']
-            for post in hot_posts:
-                title = post['data']['title']
-                print(title)
-        except (KeyError, ValueError):
-            print('Error: Unable to parse JSON response')
-    elif res.status_code == 302:  # Handle redirect
+    # Checks if the subreddit is invalid
+    if res.status_code in [302, 404]:
         print('None')
     else:
-        print(f"Error: Unexpected response code {res.status_code}")
+        res_json = res.json()
+
+        if res_json.get('data') and res_json.get('data').get('children'):
+            # Get the 10 hot posts of the subreddit
+            hot_posts = res_json.get('data').get('children')
+
+            # Print each hot post title
+            for post in hot_posts:
+                if post.get('data') and post.get('data').get('title'):
+                    print(post.get('data').get('title'))

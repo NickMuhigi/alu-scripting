@@ -6,6 +6,7 @@ subreddit.
 """
 import requests
 
+
 def top_ten(subreddit):
     base_url = 'https://www.reddit.com'
     api_uri = f'{base_url}/r/{subreddit}/hot.json'
@@ -27,4 +28,3 @@ def top_ten(subreddit):
         print('None')
     else:
         print(f"Error: Unexpected response code {res.status_code}")
-
